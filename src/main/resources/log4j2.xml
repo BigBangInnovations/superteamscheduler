@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<Configuration>
+	<Properties>
+		<!-- <Property name="log-path">C:/logs/</Property> -->
+		<Property name="log-path">/mnt/data/logs</Property>
+<!-- 		<Property name="log-path">/home/teamworks/logs/</Property> -->
+	</Properties>
+	<Appenders>
+		<!-- <Console name="stdout" target="SYSTEM_OUT"> <PatternLayout pattern="%d{yyyy-MM-dd 
+			HH:mm:ss} [%-5p] %c{1}:%L - %m%n" /> </Console> -->
+		<RollingFile name="genericFileAppender" fileName="${log-path}/teamworksAttendanceSchedularTestEnv.log"
+			filePattern="${log-path}/teamworksAttendanceSchedularTestEnv_log-%d{yyyy-MM-dd}.log">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%-5p] %c{1}:%L - %m%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="3 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="5" />
+		</RollingFile>
+		<!--<RollingFile name="versionFileAppender" fileName="${sys:catalina.home}/logs/commonServices-version.log" 
+			filePattern="${sys:catalina.home}/logs/commonServices-version-%d{yyyy-MM-dd}.log"> 
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%-5p] %c{1}:%L - %m%n" /> 
+			<Policies> <SizeBasedTriggeringPolicy size="1 MB" /> </Policies> <DefaultRolloverStrategy 
+			max="1" /> </RollingFile> -->
+	</Appenders>
+	<Loggers>
+		<Root level="debug" additivity="false">
+			<!-- <AppenderRef ref="stdout" /> -->
+			<AppenderRef ref="genericFileAppender" />
+			<!--<AppenderRef ref="versionFileAppender" /> -->
+		</Root>
+		<Logger name="com.teamworksScheduler" level="debug" additivity="false">
+			<AppenderRef ref="genericFileAppender" />
+		</Logger>
+		<Logger name="org.quartz" level="debug" additivity="false">
+			<AppenderRef ref="genericFileAppender" />
+		</Logger>
+
+	</Loggers>
+</Configuration>

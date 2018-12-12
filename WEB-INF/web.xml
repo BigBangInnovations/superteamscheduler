@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- iSmartRecruit Note:All the intellectual property rights of the source 
+	code is with iKraft Solutions. It can't be altered or modified without prior 
+	approval from iKraft Solutions. @author Amit Ghodasara @version 1.0 @since 
+	2013-01-01 -->
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>RecWeb</display-name>
+	<listener>
+		<listener-class>org.quartz.ee.servlet.QuartzInitializerListener</listener-class>
+	</listener>
+
+	<!-- Quartz Setting Start -->
+	<servlet>
+		<display-name>Quartz Initializer Servlet</display-name>
+		<servlet-name>QuartzInitializer</servlet-name>
+		<servlet-class>org.quartz.ee.servlet.QuartzInitializerServlet</servlet-class>
+		<init-param>
+			<param-name>shutdown-on-unload</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>start-scheduler-on-load</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>config-file</param-name>
+			<param-value>com/ik/user/resource/quartz.properties</param-value>
+		</init-param>
+		<init-param>
+			<param-name>quartz:wait-on-shutdown</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>quartz:start-scheduler-on-load</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<!-- Quartz Setting End -->
+</web-app>
