@@ -19,7 +19,7 @@ public class AutoCheckOutSchedulerTask {
 		if (Boolean.parseBoolean((String) Properties.get("teamworks.autocheckout.on"))) {
 			LOG.info("----------Start Auto CheckOut Scheduler----------");
 			try {
-			      //w schedulerService.autoCheckOut();
+			      //schedulerService.autoCheckOut();
 				LOG.info("----------Stop Auto CheckOut Scheduler----------");
 			} catch (Exception e) {
 				LOG.error("Error in auto checkout." + e);
