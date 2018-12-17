@@ -429,7 +429,29 @@ public class AdvanceSchedularForAttendanceServiceImpl implements AdvanceSchedula
 
 		long workingHour = 0;
 		
-		if(firstCheckIn.getTime() >= checkInFrom.getTime() && firstCheckIn.getTime() <= checkInTo.getTime())
+		if(!companyAttendance.isLateComingHalfDay() && !companyAttendance.isEarlyGoingHalfDay())
+		{
+			if(firstCheckIn.getTime() <= checkInFrom.getTime())
+			{
+				firstCheckIn = checkInFrom;
+			}
+			workingHour = getHoursMin(firstCheckIn,lastCheckOut);
+			
+			userAttendance.setHourWorked(String.valueOf(workingHour));
+			if(workingHour >= companyAttendance.getShiftHour())
+			{
+				userAttendance.setStatus(Constants.ATTENDANCE_FULLDAY);
+			}
+			else if (workingHour >= companyAttendance.getHalfDayWorkingHour())
+			{
+				userAttendance.setStatus(Constants.ATTENDANCE_HALFDAY);
+			}
+			else 
+			{
+				userAttendance.setStatus(Constants.ATTENDANCE_ABSENT);
+			}
+		}
+		else if(firstCheckIn.getTime() >= checkInFrom.getTime() && firstCheckIn.getTime() <= checkInTo.getTime())
 		{
 			if(lastCheckOut.getTime() >= checkOutFrom.getTime() && lastCheckOut.getTime() <= checkOutTo.getTime())
 			{
@@ -448,6 +470,7 @@ public class AdvanceSchedularForAttendanceServiceImpl implements AdvanceSchedula
 				}
 			}
 		}
+		
 		if (dayOfWeek == Calendar.SATURDAY)
 		{
 			userAttendance.setSaturday(true);
@@ -496,10 +519,19 @@ public class AdvanceSchedularForAttendanceServiceImpl implements AdvanceSchedula
 		
 		long workingHour = 0;
 		workingHour = getHoursMin(firstCheckIn,lastCheckOut);
-		//timeDifferenceInner = calculateTime(firstCheckIn,lastCheckOut);
-		//int workingHourInner = (int)timeDifferenceInner; 
-		
-		userAttendance.setHourWorked(String.valueOf(workingHour));
+
+		if(companyAttendance.isFlexibleHoursAllowed())
+		{
+			userAttendance.setHourWorked(String.valueOf(workingHour));
+		}
+		else 
+		{
+			if(companyAttendance.isEarlyGoingHalfDay() || companyAttendance.isLateComingHalfDay())
+			{
+				userAttendance.setHourWorked(String.valueOf(workingHour));
+			}
+		}
+			 
 		
 		boolean userCameLate = false;
 		if(companyAttendance.isLateComingHalfDay())
