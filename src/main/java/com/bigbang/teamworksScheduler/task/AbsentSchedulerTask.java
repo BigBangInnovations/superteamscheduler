@@ -18,7 +18,7 @@ public class AbsentSchedulerTask {
 		LOG.info("----------Start Absent Scheduler----------");
 		try {
 		//w	  schedulerService.absentUserScheduler(); //0 25 18 * * ? *
-			System.out.println("absent scheduler called");
+			//System.out.println("absent scheduler called");
 			//schedulerService.absentUserScheduler();
 			LOG.info("----------Stop Absent Scheduler----------");
 		} catch (Exception e) {

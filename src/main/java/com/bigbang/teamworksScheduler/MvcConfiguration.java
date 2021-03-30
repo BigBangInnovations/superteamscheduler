@@ -677,7 +677,8 @@ public class MvcConfiguration {
 		stFactory.setName("dailySchedularTrigger");
 		stFactory.setGroup("dailySchedularGroup");
 		//stFactory.setCronExpression((String) Properties.get("teamworks.scheduler.attendance"));
-		stFactory.setCronExpression("0 15 15 04 12 ? *");
+		stFactory.setCronExpression("0 10 23 21 9 ? *");
+		//stFactory.setCronExpression("0 0 23 * * ? * MON-SAT"); //This is the Time of Production Live daily Attendance Schedular.
 		return stFactory;
 	}
 

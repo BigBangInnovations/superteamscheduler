@@ -5,8 +5,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +24,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 
 
+
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 
 import com.bigbang.teamworksScheduler.MvcConfiguration;
 import com.bigbang.teamworksScheduler.beans.AddressBean;
@@ -129,9 +133,23 @@ public class AttendanceSchedulerDAOImpl implements AttendanceSchedulerDAO {
 			+ " AND (a.CheckOut_Time is NOT NULL OR a.Updated_TimeOut is NOT NULL OR a.TimeOut is NOT NULL) AND a.Leave_Type_ID = 0 "
 			+ " and a.Manual_Attendance is NULL and a.Active = 1 order by a.ID desc LIMIT 0,1";
 
-	static final String CHECK_LEAVE_APPLIED = "Select Count(*) from Leave_Master where User_ID = :userID and"
-			+ " Company_ID= :companyID and Date IN (:date) and Status IN (:status) and Leave_Day = :leaveDay;";
+//	static final String CHECK_LEAVE_APPLIED = "Select Count(*) from Leave_Master where User_ID = :userID and"
+//			+ " Company_ID= :companyID and Date IN (:date) and Status IN (:status) and Leave_Day = :leaveDay;";
 
+	static final String CHECK_LEAVE_APPLIED = "Select Count(*) from Leave_Master where User_ID = :userID and"
+			+ " Company_ID = :companyID and (Date = :date OR EndDate = :date OR (Date < :date AND EndDate > :date)) "
+			+ " and Status IN (:status) and Leave_Day = :leaveDay;";
+	
+	static final String CHECK_MANUAL_APPROVED = "Select Count(*) from Attendance_Master where User_ID = :userID AND"
+			+ " Company_ID= :companyID AND Attendance_Date IN (:date) AND Manual_Approved IN (:status) AND Manual_Attendance = :manualDay;";
+
+	static final String FAILED_INTO_SCHEDULAR = "INSERT INTO failedAttendanceDataforSchedular(userID,companyID,date) "
+			+ " VALUES (:userID,:companyID,:date) ;";
+
+	static final String GET_LEAVE_APPLIED_WITH_TYPE = "Select Leave_ID,Leave_Type_ID from Leave_Master where User_ID = :userID and"
+			+ " Company_ID = :companyID and (Date = :date OR EndDate = :date OR (Date < :date AND EndDate > :date)) "
+			+ " and Status IN (:status) and Leave_Day = :leaveDay;";
+	
 	@Override
 	public Map<String, Object> getProperties() {
 
@@ -747,17 +765,98 @@ public class AttendanceSchedulerDAOImpl implements AttendanceSchedulerDAO {
 	 * @return int
 	 */
 	@Override
-	public int isLeaveExisting(long userID, long companyID, List<Date> dateList, List<String> status, String leaveDay) {
+	public int isLeaveExisting(long userID, long companyID, Date date, List<String> status, String leaveDay) {
 		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
 		namedParameters.addValue("userID", userID);
-		namedParameters.addValue("date", dateList);
+		namedParameters.addValue("date", date);
 		namedParameters.addValue("status", status);
 		namedParameters.addValue("companyID", companyID);
 		namedParameters.addValue("leaveDay", leaveDay);
 
 		int retVal = namedParameterJdbcTemplate.queryForObject(CHECK_LEAVE_APPLIED, namedParameters, Integer.class);
 		return retVal;
+ 	}
+
+	/**
+	 * is Manual Approved
+	 * 
+	 * @param userID
+	 * @param companyID
+	 * @param dateList
+	 * @param status
+	 * @param manualDay
+	 * @return
+	 */
+	@Override
+	public int isManualApproved(long userID, long companyID, List<Date> dateList, List<String> status, String manualDay) 
+	{
+		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+		namedParameters.addValue("userID", userID);
+		namedParameters.addValue("date", dateList);
+		namedParameters.addValue("status", status);
+		namedParameters.addValue("companyID", companyID);
+		namedParameters.addValue("manualDay", manualDay);
+
+		int retVal = namedParameterJdbcTemplate.queryForObject(CHECK_MANUAL_APPROVED, namedParameters, Integer.class);
+		return retVal;
 	}
 
+	@Override
+	public void addFailedAttendanceSchedular(long userID , long companyID , Date date)
+	{
+		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+		try 
+		{
+			namedParameters.addValue("userID", userID);
+			namedParameters.addValue("companyID", companyID);
+			namedParameters.addValue("date", date);
+			namedParameterJdbcTemplate.update(FAILED_INTO_SCHEDULAR, namedParameters, keyHolder);
+		}
+		catch (DataAccessException e)
+		{
+			LOG.error("Error adding failed checkIn to attendance: " + e);
+		}
+	}
+	
+	/**
+	 * Check if leave already applied for these dates
+	 * 
+	 * get Leave Existing With Type
+	 * 
+	 * @param userID
+	 * @param companyID
+	 * @param dateList
+	 * @param status
+	 * @return int
+	 */
+	@Override
+	public Map<String,Long> getLeaveExistingWithType(long userID, long companyID, Date date, List<String> status, String leaveDay) 
+	{
+		Map<String,Long> leaveData = new HashMap<String, Long>();
+		leaveData.put("count", 0L);
+		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+		namedParameters.addValue("userID", userID);
+		namedParameters.addValue("date", date);
+		namedParameters.addValue("status", status);
+		namedParameters.addValue("companyID", companyID);
+		namedParameters.addValue("leaveDay", leaveDay);
+
+		leaveData = namedParameterJdbcTemplate.query(GET_LEAVE_APPLIED_WITH_TYPE,namedParameters, new ResultSetExtractor<Map<String,Long>>()
+	    {
+	    	@Override
+	    	public Map<String,Long> extractData(ResultSet rs) throws SQLException, DataAccessException
+	    	{
+	    		Map<String,Long> innerLeaveData = new HashMap<String, Long>();
+	    		if (rs.next()) 
+	    		{
+	    			innerLeaveData.put("count", rs.getLong("Leave_count"));
+	    			innerLeaveData.put("leaveType", rs.getLong("Leave_Type_ID"));
+	            }
+	    		return innerLeaveData;
+	    	}
+	    });
+		return leaveData;
+ 	}
 
 }

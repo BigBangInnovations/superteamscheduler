@@ -1,6 +1,7 @@
 package com.bigbang.teamworksScheduler.dao;
 
 import java.sql.ResultSet;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,6 +78,9 @@ public class UserDAOImpl implements UserDAO {
 	static final String GET_COMPANY_USER_BRANCHID = "SELECT Branch_ID,User_ID FROM "+MvcConfiguration.masterSchema+".USERS u, "+MvcConfiguration.masterSchema+".USER_ROLE ur "
 			+ "WHERE u.ID = ur.User_ID AND ur.Active = 1 AND ur.Company_ID IN (:companyIDs);";
 
+	static final String GET_DEVICEID = "SELECT User_ID, GCM_ID FROM " + MvcConfiguration.masterSchema
+			+ ".USER_APPLICATION_GCM WHERE User_ID IN (:userid) and Application_ID = :applicationid";
+
 	@Override
 	public List<Long> removeAdminUserList(List<Long> userList, final long companyId) {
 		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
@@ -120,7 +124,7 @@ public class UserDAOImpl implements UserDAO {
 		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
 		String memberIDs = "";
 		try {
-			SimpleJdbcCall call = new SimpleJdbcCall(dataSource).withFunctionName("getLowerLevelHierarchy13");
+			SimpleJdbcCall call = new SimpleJdbcCall(dataSource).withFunctionName("getLowerLevelHierarchy13TeamPro");
 			namedParameters.addValue("userid", String.valueOf(userid));
 			memberIDs = String.valueOf(call.executeFunction(Integer.class, namedParameters)).trim();
 		} catch (DataAccessException e) {
@@ -376,7 +380,6 @@ public class UserDAOImpl implements UserDAO {
 					companyAttendance.setCalculateDaily(rs.getBoolean("isCalculateDaily"));
 					companyAttendance.setCalculateWeekly(rs.getBoolean("isCalculateWeekly"));
 					companyAttendance.setCalculateMonthly(rs.getBoolean("isCalculateMonthly"));
-					companyAttendance.setCalculateMonthly(rs.getBoolean("isCalculateMonthly"));
 					companyAttendance.setLateleavingNextDayLateAllowed(rs.getBoolean("lateleavingNextDayLateAllowed"));
 					companyAttendance.setLateleavingNextDateLatetime(rs.getTime("lateleavingNextDateLatetime"));
 					companyAttendance.setMaximumLateAllowedForLateLeaving(rs.getTime("maximumLateAllowedForLateLeaving"));
@@ -390,6 +393,8 @@ public class UserDAOImpl implements UserDAO {
 					companyAttendance.setWorkingSaturday(rs.getString("Working_Saturdays"));
 					companyAttendance.setWorkingDays(rs.getString("Working_Days"));
 					companyAttendance.setSaturdayPolicy(rs.getBoolean("Saturday_Policy"));
+					companyAttendance.setApprovalmaxworkinghours(rs.getBoolean("approvalMaxWorkingHours"));
+					companyAttendance.setAftermidnightCheckoutAllow(rs.getBoolean("aftermidnightCheckoutAllow"));
 					return companyAttendance;
 				}
 				return null;
@@ -416,5 +421,79 @@ public class UserDAOImpl implements UserDAO {
 			});
 		
 	}
+
+	@Override
+	public Users getUserDetail(long userID) {
+		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+		namedParameters.addValue("ID", userID);
+		Users aUser = new Users();
+		try {
+			 namedParameterJdbcTemplate.query(GET_USER_DETAILS, namedParameters,
+					new RowMapper<Users>() {
+						@Override
+						public Users mapRow(final ResultSet rs, final int rowNum) throws SQLException {
+							aUser.setUserId(Long.parseUnsignedLong(rs.getString("ID")));
+							aUser.setFirstName(rs.getString("First_Name"));
+							aUser.setLastName(rs.getString("Last_Name"));
+							aUser.setPicture(rs.getString("Picture"));
+							if (aUser.getPicture() == null) {
+								aUser.setPicture("");
+							}
+							return aUser;
+						}
+					});
+			 return aUser;
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("Error getting user ID discarding Admin role", e);
+			return null;
+		}
+	}
+	
+	@Override
+	public String getUpperHierarchyDetails(final long userid) {
+		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+		String managerIDs = "";
+		try {
+			SimpleJdbcCall call = new SimpleJdbcCall(dataSource).withFunctionName("getUpperLevelHierarchy");
+			namedParameters.addValue("userid", String.valueOf(userid));
+			managerIDs = String.valueOf(call.executeFunction(Integer.class, namedParameters)).trim();
+		} catch (DataAccessException e) {
+			LOG.error("Error executing function to read manager upper hierarchy" + e);
+			return null;
+		}
+		return managerIDs;
+	}
+	
+	@Override
+	public String getDeviceID(final long userid)
+	{
+		
+		MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+		namedParameters.addValue("userid", userid);
+		namedParameters.addValue("applicationid", 1);
+		try 
+		{
+			return namedParameterJdbcTemplate.query(GET_DEVICEID, namedParameters, new ResultSetExtractor<String>() {
+				@Override
+				public String extractData(final ResultSet rs) throws SQLException, DataAccessException
+				{
+					if (rs.next())
+					{
+						if (rs.getString("GCM_ID") != null)
+							return rs.getString("GCM_ID");
+						else
+							return "";
+					}
+				return "";
+			}
+		});
+		} catch (EmptyResultDataAccessException e) {
+			return "";
+		} catch (DataAccessException e) {
+			return null;
+		}
+	}
+
 
 }

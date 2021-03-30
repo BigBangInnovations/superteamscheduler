@@ -248,6 +248,7 @@ public class TrackingDistanceSchedulerServiceImpl implements TrackingDistanceSch
 			}
 			MailUtil mailUtil = new MailUtil();
 			Session session =Session.getInstance(mailUtil.setMailingProperties1());
+
 			Transport transport = session.getTransport("smtp");
 			transport.connect("email-smtp.us-west-2.amazonaws.com", "AKIAJXW7T6XVNC77WM2Q", "AsNFJxvrnIjpMWABBXq0cCC3U2NIaBNRd66tfIuh9rW5");
 			

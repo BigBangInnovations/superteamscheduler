@@ -3,8 +3,11 @@ package com.bigbang.teamworksScheduler.util;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.TimeZone;
 
 public class Util {
@@ -52,4 +55,41 @@ public class Util {
 			return null;
 		}
 	}
+	
+	public static Date getWeekStartDate(Date dateObj) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dateObj);
+		int month = calendar.get(Calendar.MONTH);
+		
+		while ((month == calendar.get(Calendar.MONTH)) && calendar.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
+			calendar.add(Calendar.DATE, -1);
+		}
+		if (month != calendar.get(Calendar.MONTH)) {
+			calendar.add(Calendar.DATE, 1);
+		}
+		return calendar.getTime();
+	}
+
+	public static List<Date> getDaysBetweenStartDateAndEndDate(Date startdate,Date enddate) {
+
+		List<Date> dates = new ArrayList<Date>();
+		Calendar calendar = new GregorianCalendar();
+		calendar.setTime(startdate);
+		while (calendar.getTime().before(enddate)) {
+			Date result = calendar.getTime();
+			dates.add(result);
+			calendar.add(Calendar.DATE, 1);
+		}
+		dates.add(enddate);
+		return dates;
+	}
+	
+	public static Date getMonthStartDate(Date date)
+	{
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.set(Calendar.DAY_OF_MONTH,calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+		return calendar.getTime();
+	}
+
 }

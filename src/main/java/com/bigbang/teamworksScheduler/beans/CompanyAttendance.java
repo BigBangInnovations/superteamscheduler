@@ -49,6 +49,7 @@ public class CompanyAttendance
 	private long modifiedBy;
 	private long isDefaultShift;
 	private boolean approvalmaxworkinghours;
+	private boolean aftermidnightCheckoutAllow;
 	public long getId() {
 		return id;
 	}
@@ -324,6 +325,12 @@ public class CompanyAttendance
 	}
 	public void setApprovalmaxworkinghours(boolean approvalmaxworkinghours) {
 		this.approvalmaxworkinghours = approvalmaxworkinghours;
+	}
+	public boolean isAftermidnightCheckoutAllow() {
+		return aftermidnightCheckoutAllow;
+	}
+	public void setAftermidnightCheckoutAllow(boolean aftermidnightCheckoutAllow) {
+		this.aftermidnightCheckoutAllow = aftermidnightCheckoutAllow;
 	}
 	
 	

@@ -39,4 +39,10 @@ public interface UserDAO {
 	public CompanyAttendance getShiftDetailOfUser(long shiftID,long companyID);
 
 	Map<Long, Long> getBranchIDOfAllActiveCompanies(List<Long> companyIDs);
+	
+	Users getUserDetail(long userID);
+	
+	public String getUpperHierarchyDetails(final long userid);
+	
+	public String getDeviceID(final long userid);
 }

@@ -86,7 +86,7 @@
 		 <dependency>
 			<groupId>notification.code</groupId>
 			<artifactId>notification</artifactId>
-			<version>2.0.0</version>
+			<version>3.0.0</version>
 		</dependency> 
 		<!-- iOS Notification libraries -->
 		<dependency>
@@ -169,7 +169,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.6</version>
+			<version>5.1.18</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>

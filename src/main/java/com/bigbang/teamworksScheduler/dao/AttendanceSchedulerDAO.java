@@ -47,6 +47,12 @@ public interface AttendanceSchedulerDAO {
 
 	public Attendance getUserAttendance(long userID, long companyID, Date date);
 	
-	int isLeaveExisting(long userID, long companyID, List<Date> dateList, List<String> status, String leaveDay);
+	int isLeaveExisting(long userID, long companyID, Date date, List<String> status, String leaveDay);
+
+	int isManualApproved(long userID, long companyID, List<Date> dateList,List<String> status, String manualDay);
+
+	void addFailedAttendanceSchedular(long userID, long companyID, Date date);
+
+	Map<String, Long> getLeaveExistingWithType(long userID, long companyID, Date date, List<String> status, String leaveDay);
 
 }

@@ -1,11 +1,11 @@
 package com.bigbang.teamworksScheduler.task;
 
 import org.apache.logging.log4j.LogManager;
+
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.bigbang.teamworksScheduler.service.AdvanceSchedularForAttendanceService;
-import com.bigbang.teamworksScheduler.service.AttendanceSchedulerService;
+
 
 public class RunDailySchedularForAttendanceSchedularTask 
 {
@@ -19,9 +19,7 @@ public class RunDailySchedularForAttendanceSchedularTask
 		try
 		{
 			LOG.info("----------Start RunDailySchedularForAttendance Scheduler----------");
-			
-			//attendanceService.runDailySchedular();
-
+			//attendanceService.runDailySchedularForAllCompanyExceptSchbang();
 			LOG.info("----------Stop RunDailySchedularForAttendance Scheduler----------");
 		}
 		catch(Exception e)

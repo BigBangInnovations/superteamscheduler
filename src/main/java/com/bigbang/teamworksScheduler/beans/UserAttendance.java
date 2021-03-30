@@ -21,6 +21,8 @@ public class UserAttendance
 	private boolean earlyGoing;
 	private boolean isAbsent;
 	
+	private long leaveTypeID;
+	
 	public long getID() {
 		return ID;
 	}
@@ -117,6 +119,13 @@ public class UserAttendance
 	public void setAbsent(boolean isAbsent) {
 		this.isAbsent = isAbsent;
 	}
+	public long getLeaveTypeID() {
+		return leaveTypeID;
+	}
+	public void setLeaveTypeID(long leaveTypeID) {
+		this.leaveTypeID = leaveTypeID;
+	}
+	
 	
 	
 }

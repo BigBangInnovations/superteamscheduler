@@ -88,15 +88,40 @@ public class DataController {
 	}
 	
 	@RequestMapping(value = "/attendanceSchedular", method = RequestMethod.GET)
-	public String attendanceSchedular(@RequestParam(value = "UserID") final long userID,@RequestParam(value = "CompanyID") final long companyID, @RequestParam(value = "Date") final Date date) 
+	public String attendanceSchedular(@RequestParam(value = "UserID") final long userID,@RequestParam(value = "CompanyID") final long companyID, @RequestParam(value = "StartDate") final Date startDate, @RequestParam(value = "EndDate") final Date endDate) 
 	{
-
 		LOG.info("API: attendanceSchedular");
 		try {
-			advanceSchedularForAttendanceService.runDailySchedular(companyID , userID , date);
+			advanceSchedularForAttendanceService.runDailySchedular(companyID , userID , startDate ,endDate);
 			return "Success";
 		} catch (Exception e) {
 			LOG.error("Error in creating company: ", e);
+			return "Error";
+		}
+	}
+
+	@RequestMapping(value = "/weeklySchedular", method = RequestMethod.GET)
+	public String weeklySchedular(@RequestParam(value = "Date") final Date date)//,@RequestParam(value="UserID") final long userID,@RequestParam(value="CompanyID") long companyID
+	{
+		LOG.info("API: weeklySchedular");
+		try {
+			advanceSchedularForAttendanceService.weeklySchedularExecution(date);//,userID,companyID
+			return "Success";
+		} catch (Exception e) {
+			LOG.error("Error in weekly Schedular : ", e);
+			return "Error";
+		}
+	}
+
+	@RequestMapping(value = "/monthlySchedular", method = RequestMethod.GET)
+	public String monthlySchedular(@RequestParam(value = "Date") final Date date,@RequestParam(value="CompanyID") final long companyID) 
+	{
+		LOG.info("API: monthlySchedular");
+		try {
+			advanceSchedularForAttendanceService.monthlySchedularExecution(date,companyID);
+			return "Success";
+		} catch (Exception e) {	
+			LOG.error("Error in monthly Schedular : ", e);
 			return "Error";
 		}
 	}

@@ -2,17 +2,20 @@
 <!DOCTYPE xml>
 <Configuration>
 	<Properties>
+		<!-- schbangLogData -->
+		<!-- SchbangLiveAttSche -->
 		<!-- <Property name="log-path">C:/logs/</Property> -->
 		<Property name="log-path">/mnt/data/logs</Property>
 <!-- 		<Property name="log-path">/home/teamworks/logs/</Property> -->
 	</Properties>
 	<Appenders>
-		<!-- <Console name="stdout" target="SYSTEM_OUT"> <PatternLayout pattern="%d{yyyy-MM-dd 
-			HH:mm:ss} [%-5p] %c{1}:%L - %m%n" /> </Console> -->
-		<RollingFile name="genericFileAppender" fileName="${log-path}/teamworksAttendanceSchedularTestEnv.log"
-			filePattern="${log-path}/teamworksAttendanceSchedularTestEnv_log-%d{yyyy-MM-dd}.log">
+		<Console name="stdout" target="SYSTEM_OUT"> <PatternLayout pattern="%d{yyyy-MM-dd 
+			HH:mm:ss} [%-5p] %c{1}:%L - %m%n" /> </Console> 
+		<RollingFile name="genericFileAppender" fileName="${log-path}/SchbangLiveAttSche.log"
+			filePattern="${log-path}/SchbangLiveAttSche-%d{yyyy-MM-dd}.log">
 			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%-5p] %c{1}:%L - %m%n" />
 			<Policies>
+				<!--<TimeBasedTriggeringPolicy interval="1" modulate="true"/> -->
 				<SizeBasedTriggeringPolicy size="3 MB" />
 			</Policies>
 			<DefaultRolloverStrategy max="5" />
@@ -25,7 +28,7 @@
 	</Appenders>
 	<Loggers>
 		<Root level="debug" additivity="false">
-			<!-- <AppenderRef ref="stdout" /> -->
+			<AppenderRef ref="stdout" /> 
 			<AppenderRef ref="genericFileAppender" />
 			<!--<AppenderRef ref="versionFileAppender" /> -->
 		</Root>
